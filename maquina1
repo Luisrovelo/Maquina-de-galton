@@ -1,0 +1,55 @@
+# Importar bibliotecas necesarias
+import random
+import matplotlib.pyplot as plt
+from scipy.stats import binom  # Para la distribución teórica
+import numpy as np  # Para trabajar con arrays
+
+# Función para simular el recorrido de una canica
+def simular_canica(niveles):
+    """
+    Simula el recorrido de una canica a través de los niveles de la máquina de Galton.
+    Cada nivel, la canica cae a la izquierda (-1) o a la derecha (+1) de manera aleatoria.
+    Al final, devuelve la posición final de la canica en los contenedores.
+    """
+    posicion = 0  # Inicia en el centro (posición 0)
+    for _ in range(niveles):
+        # Decidir si la canica cae a la izquierda (-1) o a la derecha (+1)
+        posicion += random.choice([-1, 1])
+        # Limitar la posición para que no se salga de los contenedores extremos
+        posicion = max(-niveles, min(niveles, posicion))
+    return posicion
+
+# Función para graficar el histograma de los resultados
+def graficar_histograma(resultados, niveles):
+    """
+    Grafica un histograma que muestra la distribución de las canicas en los contenedores.
+    Además, superpone la distribución teórica (binomial) para comparación.
+    """
+    # Graficar la simulación
+    plt.hist(resultados, bins=niveles + 1, color='blue', edgecolor='black', density=True, alpha=0.7, label="Simulación")
+
+    # Calcular y graficar la distribución teórica (binomial)
+    x = np.arange(-niveles, niveles + 1, 2)  # Posiciones posibles de los contenedores (usando np.arange)
+    p = 0.5  # Probabilidad de caer a la izquierda o derecha
+    plt.plot(x, binom.pmf((x + niveles) // 2, niveles, p), 'ro-', label="Distribución Teórica")
+
+    # Añadir detalles al gráfico
+    plt.title("Distribución de Canicas en la Máquina de Galton")
+    plt.xlabel("Contenedores")
+    plt.ylabel("Densidad de Canicas")
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
+# Parámetros de la simulación
+num_canicas = 3000  # Número de canicas
+niveles = 12        # Número de niveles de obstáculos
+
+# Simular el recorrido de todas las canicas
+resultados = []
+for _ in range(num_canicas):
+    posicion_final = simular_canica(niveles)
+    resultados.append(posicion_final)
+
+# Graficar el histograma de los resultados
+graficar_histograma(resultados, niveles)
